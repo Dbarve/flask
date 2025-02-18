@@ -797,6 +797,14 @@ class CertParamType(click.ParamType):
     def convert(
         self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None
     ) -> t.Any:
+        try:
+            import ssl
+        except ImportError:
+            raise click.BadParameter(
+                'Using "--cert" requires Python to be compiled with SSL support.',
+                ctx,
+                param,
+            ) from None
 
         try:
             return self.path_type(value, param, ctx)
@@ -817,6 +825,10 @@ class CertParamType(click.ParamType):
 
             obj = import_string(value, silent=True)
 
+            if isinstance(obj, ssl.SSLContext):
+                return obj
+
+            raise
 
 
 def _validate_key(ctx: click.Context, param: click.Parameter, value: t.Any) -> t.Any:
