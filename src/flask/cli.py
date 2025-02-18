@@ -7,6 +7,7 @@ import inspect
 import os
 import platform
 import re
+import ssl
 import sys
 import traceback
 import typing as t
@@ -25,7 +26,6 @@ from .helpers import get_debug_flag
 from .helpers import get_load_dotenv
 
 if t.TYPE_CHECKING:
-    import ssl
 
     from _typeshed.wsgi import StartResponse
     from _typeshed.wsgi import WSGIApplication
@@ -797,14 +797,6 @@ class CertParamType(click.ParamType):
     def convert(
         self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None
     ) -> t.Any:
-        try:
-            import ssl
-        except ImportError:
-            raise click.BadParameter(
-                'Using "--cert" requires Python to be compiled with SSL support.',
-                ctx,
-                param,
-            ) from None
 
         try:
             return self.path_type(value, param, ctx)
@@ -825,10 +817,6 @@ class CertParamType(click.ParamType):
 
             obj = import_string(value, silent=True)
 
-            if isinstance(obj, ssl.SSLContext):
-                return obj
-
-            raise
 
 
 def _validate_key(ctx: click.Context, param: click.Parameter, value: t.Any) -> t.Any:

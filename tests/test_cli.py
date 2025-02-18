@@ -638,13 +638,6 @@ def test_run_cert_import(monkeypatch):
         run_command.make_context("run", ["--cert", "ssl_context", "--key", __file__])
 
 
-def test_run_cert_no_ssl(monkeypatch):
-    monkeypatch.setitem(sys.modules, "ssl", None)
-
-    with pytest.raises(click.BadParameter):
-        run_command.make_context("run", ["--cert", "not_here"])
-
-
 def test_cli_blueprints(app):
     """Test blueprint commands register correctly to the application"""
     custom = Blueprint("custom", __name__, cli_group="customized")
